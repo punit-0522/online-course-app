@@ -8,6 +8,20 @@ class Course(models.Model):
         return self.name
 
 
+class Instructor(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class Learner(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
 class Lesson(models.Model):
     title = models.CharField(max_length=100)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)

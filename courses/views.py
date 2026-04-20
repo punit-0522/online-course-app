@@ -1,29 +1,52 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Course, Choice, Submission
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Course, Question, Choice, Submission
 
+
+# COURSE PAGE
 def course_detail(request, course_id):
     course = get_object_or_404(Course, pk=course_id)
+    questions = Question.objects.filter(lesson__course=course)
+
+    return render(request, 'courses/course_detail.html', {
+        'course': course,
+        'questions': questions
+    })
+
+
+# REQUIRED: SUBMIT VIEW
+def submit(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    questions = Question.objects.filter(lesson__course=course)
 
     if request.method == 'POST':
-        selected_choices = request.POST.getlist('choice')
+        score = 0
+        total = questions.count()
 
-        submission = Submission.objects.create()
+        for question in questions:
+            selected_choice_id = request.POST.get(str(question.id))
 
-        correct = 0
-        total = 0
+            if selected_choice_id:
+                choice = Choice.objects.get(id=selected_choice_id)
+                if choice.is_correct:
+                    score += 1
 
-        for choice_id in selected_choices:
-            choice = Choice.objects.get(id=choice_id)
-            submission.choices.add(choice)
+        submission = Submission.objects.create(
+            course=course,
+            score=score
+        )
 
-            if choice.is_correct:
-                correct += 1
-            total += 1
+        return redirect('show_exam_result',
+                        course_id=course.id,
+                        submission_id=submission.id)
 
-        score = int((correct / total) * 100) if total > 0 else 0
+    return redirect('course_detail', course_id=course.id)
 
-        return render(request, 'courses/exam_result.html', {
-            'score': score
-        })
 
-    return render(request, 'courses/course_detail.html', {'course': course})
+# REQUIRED: RESULT VIEW
+def show_exam_result(request, course_id, submission_id):
+    submission = get_object_or_404(Submission, id=submission_id)
+
+    return render(request, 'courses/exam_result.html', {
+        'submission': submission,
+        'score': submission.score
+    })

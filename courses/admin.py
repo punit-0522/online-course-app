@@ -12,17 +12,21 @@ class QuestionInline(admin.TabularInline):
     extra = 1
 
 
-class QuestionAdmin(admin.ModelAdmin):
-    inlines = [ChoiceInline]
-    list_display = ['text']
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
 
 
 class LessonAdmin(admin.ModelAdmin):
+    list_display = ('title', 'course')
     inlines = [QuestionInline]
-    list_display = ['title', 'course']
 
 
-admin.site.register(Course)
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = ('text', 'lesson')
+    inlines = [ChoiceInline]
+
+
+admin.site.register(Course, CourseAdmin)
 admin.site.register(Lesson, LessonAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Choice)
