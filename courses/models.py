@@ -2,14 +2,14 @@ from django.db import models
 
 
 class Course(models.Model):
-    title = models.CharField(max_length=200)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Lesson(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=100)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -17,7 +17,7 @@ class Lesson(models.Model):
 
 
 class Question(models.Model):
-    text = models.CharField(max_length=300)
+    text = models.CharField(max_length=200)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -25,8 +25,8 @@ class Question(models.Model):
 
 
 class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     text = models.CharField(max_length=200)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     is_correct = models.BooleanField(default=False)
 
     def __str__(self):
@@ -34,5 +34,7 @@ class Choice(models.Model):
 
 
 class Submission(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    score = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Submission {self.id}"
