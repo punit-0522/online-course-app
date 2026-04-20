@@ -29,6 +29,9 @@ class Choice(models.Model):
     text = models.CharField(max_length=200)
     is_correct = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.text
+
 
 class Submission(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
